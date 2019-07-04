@@ -1,0 +1,83 @@
+#
+# This Docker-compose is for deploying GC2 in a Docker Swarm at AWS.
+# IMPORTANT: All volumes must shared. Here is Cloudstor used.
+# No PostgreSQL/PostGIS. Run and scale PG on AWS RDS.
+#
+# It requires the use of Traefik as reverse proxy.
+# Docker-compose file for Traefik is included in this repository.
+#
+# How to:
+##
+# Set the traefik.frontend.rule is this file to your DNS name.
+#
+# The run following commands:
+#
+
+version: '3'
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
+services:
+
+  gc2core:
+    image: mapcentia/gc2core
+    privileged: true
+    volumes:
+      - gc2core_var_www_geocloud2_app_wms:/var/www/geocloud2/app/wms
+      - gc2core_var_www_geocloud2_app_tmp:/var/www/geocloud2/app/tmp
+      - gc2core_var_www_geocloud2_public_logs:/var/www/geocloud2/public/logs
+      - gc2core_var_log:/var/log
+      - gc2core_var_lib_php_sessions:/var/lib/php/sessions
+    deploy:
+     labels:
+      - traefik.backend=swarm.gc2.io
+      - traefik.frontend.rule=Host:gc2.io # SET HOST
+      - traefik.port=80
+      - traefik.backend.loadbalancer.swarm=true
+      - traefik.docker.network=web
+      - traefik.frontend.passHostHeader=true
+    networks:
+      - internal
+      - web
+
+  mapcache:
+    image: mapcentia/mapcache
+    networks:
+      - internal
+    volumes:
+      - gc2core_var_www_geocloud2_app_wms:/var/www/geocloud2/app/wms
+      - mapcache_etc_apache2_sites-enabled:/etc/apache2/sites-enabled
+
+volumes:
+    # gc2core
+    gc2core_var_www_geocloud2_app_tmp:
+      driver: cloudstor:aws
+      driver_opts:
+        backing: shared
+
+    gc2core_var_www_geocloud2_app_wms:
+      driver: cloudstor:aws
+      driver_opts:
+        backing: shared
+
+    gc2core_var_www_geocloud2_public_logs:
+      driver: cloudstor:aws
+      driver_opts:
+        backing: shared
+
+    gc2core_var_log:
+      driver: cloudstor:aws
+      driver_opts:
+        backing: shared
+
+    gc2core_var_lib_php_sessions:
+      driver: cloudstor:aws
+      driver_opts:
+        backing: shared
+
+    # mapcache
+    mapcache_etc_apache2_sites-enabled:

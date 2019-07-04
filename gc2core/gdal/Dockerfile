@@ -1,36 +1,8 @@
-FROM mapcentia/gc2core:base
+FROM mapcentia/gc2core:ecw
 MAINTAINER Martin Høgh<mh@mapcentia.com>
 
 RUN export DEBIAN_FRONTEND=noninteractive
 ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get -y update  --fix-missing
-RUN apt-get -y install default-jre default-jdk
-
-RUN cd ~ &&\
-    wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/mdb-sqlite/mdb-sqlite-1.0.2.tar.bz2 &&\
-    tar -vxjf mdb-sqlite-1.0.2.tar.bz2
-
-RUN cd ~ &&\
-    cp mdb-sqlite-1.0.2/lib/jackcess-1.1.14.jar /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/ &&\
-    cp mdb-sqlite-1.0.2/lib/commons-logging-1.1.1.jar /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/ &&\
-    cp mdb-sqlite-1.0.2/lib/commons-lang-2.4.jar /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/
-
-
-# Install ECW 3.3
-RUN wget http://www.kyngchaos.com/files/macosxport/libecwj2-3.3-2006-09-06.zip &&\
-	unzip libecwj2-3.3-2006-09-06.zip &&\
-	wget http://trac.osgeo.org/gdal/raw-attachment/ticket/3162/libecwj2-3.3-msvc90-fixes.patch &&\
-	patch -p0< libecwj2-3.3-msvc90-fixes.patch &&\
-	wget http://osgeo-org.1560.x6.nabble.com/attachment/5001530/0/libecwj2-3.3-wcharfix.patch &&\
-	wget http://trac.osgeo.org/gdal/raw-attachment/ticket/3366/libecwj2-3.3-NCSPhysicalMemorySize-Linux.patch &&\
-	cd libecwj2-3.3/ &&\
-	patch -p0< ../libecwj2-3.3-NCSPhysicalMemorySize-Linux.patch &&\
-	patch -p1< ../libecwj2-3.3-wcharfix.patch &&\
-	./configure &&\
-	make &&\
-	make install
-
 
 # Install GDAL 2.2.1 from source
 RUN wget http://download.osgeo.org/gdal/2.2.1/gdal221.zip && \

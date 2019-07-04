@@ -17,21 +17,16 @@ class App
         "databaseTemplate" => "template_geocloud",
 
         // The host of Elasticsearch
-        "esHost" => "elasticsearch",
-
-        // Geoserver host for printing.
-        "geoserverHost" => "http://eu1.mapcentia.com:8888",
+        //"esHost" => "elasticsearch",
 
         // MapCache config
+        // In Docker use the names of the containers
         "mapCache" => [
             // MapCache host URL.
-            "host" => "http://127.0.0.1:5555",
+            "host" => "http://mapcache:5555",
 
-            // WMS backend for MapCache. Define the WMS host seen from MapCache.
-            "wmsHost" => "http://127.0.0.1:80",
-
-            // MapCache API URL for reload and adding new configurations
-            "api" => "http://127.0.0.1:1337",
+            // WMS backend for MapCache. Define gc2core host seen from MapCache container.
+            "wmsHost" => "http://gc2core:80",
 
             // Type of cache back-end. "disk" or "sqlite"
             "type" => "disk",
@@ -48,9 +43,6 @@ class App
 
         // Master password for admin. MD5 hashed.
         "masterPw" => null,
-
-        // Render backend for tile cache ["wms" | "python"]
-        "tileRenderBackend" => "python",
 
         // Available baselayer
         "baseLayers" => array(
@@ -87,9 +79,6 @@ class App
         // If true, low layer sort id puts the layer on top
         "reverseLayerOrder" => false,
 
-        // Enable the Leaflet Draw plugin in viewer
-        "leafletDraw" => false,
-
         // Use Intercom.io for messaging MapCentia
         "intercom_io" => true,
 
@@ -102,10 +91,7 @@ class App
         //    "schemas" => array("DK"),
         //),
 
-        //Hide layers without a group in viewer
-        "hideUngroupedLayers" => true,
-
-        // Trust theese IPs
+        // Trust these IPs
         "trustedAddresses" => array(
           "127.0.0.1/32"
         ),
@@ -113,18 +99,8 @@ class App
         // Enable Elasticsearch indexing in GUI
         "esIndexingInGui" => true,
 
-        "enablePrint" => array(
-            "*" => true,
-        ),
-
         //Show download options in Heron-mc
         "showDownloadOtionsInHeron" => true,
-
-        "customPrintParams" => array(
-            "mapTitle" => "Map title",
-            "mapComment" => "Map comment",
-            "mapFooter" => "Map footer",
-        ),
 
         //Show workflow options
         "enableWorkflow" => array(
@@ -138,6 +114,85 @@ class App
 
         // Use API key for Elasticsearch Search API
         "useKeyForSearch" => false,
+
+        // Allowed origins for CORS
+        "AccessControlAllowOrigin" => [
+            "*"
+        ],
+
+        // Meta properties
+        "metaConfig" => [
+            [
+                "fieldsetName" => "Layer type",
+                "fields" => [
+                    [
+                        "name" => "vidi_layer_type",
+                        "type" => "checkboxgroup",
+                        "title" => "Type",
+                        "values" => [
+                            ["name" => "Vector", "value" => "v"],
+                            ["name" => "Raster tile", "value" => "t"],
+                            ["name" => "Vector tile", "value" => "mvt"],
+                            ["name" => "WebGL", "value" => "w"]
+                        ],
+                        "default" => "t",
+                    ],
+                    [
+                        "name" => "vidi_layer_editable",
+                        "type" => "checkbox",
+                        "title" => "Editable",
+                        "default" => false,
+                    ]
+                ]
+            ],
+            [
+                "fieldsetName" => "Tile settings",
+                "fields" => [
+                    [
+                        "name" => "single_tile",
+                        "type" => "checkbox",
+                        "title" => "Single tile (WMS)",
+                        "default" => false,
+                    ],
+                    [
+                        "name" => "tiles_service_uri",
+                        "type" => "text",
+                        "title" => "Tiles service uri",
+                    ],
+                ]
+
+            ],
+            [
+                "fieldsetName" => "Vector settings",
+                "fields" => [
+                    [
+                        "name" => "load_strategy",
+                        "type" => "combo",
+                        "title" => "Load strategy",
+                        "values" => [
+                            ["name" => "Static", "value" => "s"],
+                            ["name" => "Dynamic", "value" => "d"],
+                        ],
+                        "default" => "s",
+                    ]
+                ]
+
+            ],
+            [
+                "fieldsetName" => "Layer tree",
+                "fields" => [
+                    [
+                        "name" => "vidi_sub_group",
+                        "type" => "text",
+                        "title" => "Sub group",
+                    ],
+                ]
+
+            ],
+        ],
+
+        "vidiUrl" => "http://172.18.0.210:3000",
+
     );
     function __construct(){
         // This is the autoload function and include path setting. No need to fiddle with this.

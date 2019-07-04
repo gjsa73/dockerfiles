@@ -1,0 +1,31 @@
+#
+# The run following commands:
+#
+#
+# 'docker-compose down' will not remove data
+# 'docker-compose down -v' will remove the volumes!!!
+
+version: '3'
+
+networks:
+  web:
+    external: true
+
+services:
+  pgbouncer:
+    image: mapcentia/pgbouncer
+    networks:
+      - web
+    ports:
+      - "5433:5433"  
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
