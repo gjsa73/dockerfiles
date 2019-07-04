@@ -191,7 +191,7 @@ class App
             ],
         ],
 
-        "vidiUrl" => "http://127.0.0.1:3000",
+        "vidiUrl" => "http://172.18.0.210:3000",
 
     );
     function __construct(){
